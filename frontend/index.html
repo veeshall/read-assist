@@ -8,6 +8,9 @@
         .highlight {
             background-color: yellow;
         }
+        #loading {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -16,12 +19,18 @@
         <input type="text" id="url-input" placeholder="Enter a URL" required>
         <button type="submit">Process URL</button>
     </form>
+    <div id="loading">Loading...</div>
     <div id="content"></div>
 
     <script>
         document.getElementById('url-form').addEventListener('submit', async (event) => {
             event.preventDefault();
             const url = document.getElementById('url-input').value;
+            const loadingDiv = document.getElementById('loading');
+            const contentDiv = document.getElementById('content');
+            contentDiv.innerHTML = '';
+            loadingDiv.style.display = 'block';
+
             const response = await fetch('/api/process-url', {
                 method: 'POST',
                 headers: {
@@ -29,9 +38,9 @@
                 },
                 body: JSON.stringify({ url })
             });
+
+            loadingDiv.style.display = 'none';
             const data = await response.json();
-            const contentDiv = document.getElementById('content');
-            contentDiv.innerHTML = '';
             const progressResponse = await fetch('/api/progress');
             const progress = await progressResponse.json();
             const readParagraphs = progress.read_paragraphs || {};

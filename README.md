@@ -21,6 +21,7 @@ This tool helps you convert online documentation into a "book" that you can read
 ## How to Use
 
 1.  **Enter a URL:** Enter the URL of the documentation you want to read in the input field and click "Process URL".
+    *   **Example:** `https://github.com/google-gemini/gemini-cli/blob/main/docs/index.md`
 2.  **Read the content:** The content of the URL will be displayed on the page, split into paragraphs.
 3.  **Track your progress:** Use the checkboxes to mark the paragraphs you have read.
 4.  **Highlight text:** Select the text you want to highlight and click the "Highlight" button.
