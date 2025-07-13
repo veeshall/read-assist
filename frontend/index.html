@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Docs to Books</title>
+    <style>
+        .highlight {
+            background-color: yellow;
+        }
+    </style>
+</head>
+<body>
+    <h1>Docs to Books</h1>
+    <form id="url-form">
+        <input type="text" id="url-input" placeholder="Enter a URL" required>
+        <button type="submit">Process URL</button>
+    </form>
+    <div id="content"></div>
+
+    <script>
+        document.getElementById('url-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const url = document.getElementById('url-input').value;
+            const response = await fetch('/api/process-url', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ url })
+            });
+            const data = await response.json();
+            const contentDiv = document.getElementById('content');
+            contentDiv.innerHTML = '';
+            const progressResponse = await fetch('/api/progress');
+            const progress = await progressResponse.json();
+            const readParagraphs = progress.read_paragraphs || {};
+            const annotationsResponse = await fetch('/api/annotations');
+            const annotations = await annotationsResponse.json();
+            const paragraphAnnotations = annotations.annotations || {};
+
+            data.paragraphs.forEach(p => {
+                const pDiv = document.createElement('div');
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = readParagraphs[p.id] || false;
+                checkbox.addEventListener('change', async (event) => {
+                    await fetch('/api/progress', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            paragraph_id: p.id,
+                            read: event.target.checked
+                        })
+                    });
+                });
+                pDiv.appendChild(checkbox);
+
+                const pElem = document.createElement('p');
+                pElem.innerText = p.text;
+                pElem.id = p.id;
+                if (paragraphAnnotations[p.id] && paragraphAnnotations[p.id].highlight) {
+                    pElem.classList.add('highlight');
+                }
+                pDiv.appendChild(pElem);
+
+                const highlightButton = document.createElement('button');
+                highlightButton.innerText = 'Highlight';
+                highlightButton.addEventListener('click', async () => {
+                    const selection = window.getSelection().toString();
+                    if (selection) {
+                        await fetch('/api/annotations', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                paragraph_id: p.id,
+                                highlight: selection
+                            })
+                        });
+                        pElem.classList.add('highlight');
+                    }
+                });
+                pDiv.appendChild(highlightButton);
+
+                const noteTextarea = document.createElement('textarea');
+                noteTextarea.placeholder = 'Add a note...';
+                if (paragraphAnnotations[p.id] && paragraphAnnotations[p.id].note) {
+                    noteTextarea.value = paragraphAnnotations[p.id].note;
+                }
+                const saveNoteButton = document.createElement('button');
+                saveNoteButton.innerText = 'Save Note';
+                saveNoteButton.addEventListener('click', async () => {
+                    await fetch('/api/annotations', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            paragraph_id: p.id,
+                            note: noteTextarea.value
+                        })
+                    });
+                });
+                pDiv.appendChild(noteTextarea);
+                pDiv.appendChild(saveNoteButton);
+
+                contentDiv.appendChild(pDiv);
+            });
+        });
+    </script>
+</body>
+</html>
