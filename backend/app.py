@@ -1,5 +1,7 @@
 from flask import Flask, request, jsonify, send_from_directory
-import requests
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service as ChromeService
+from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup
 import os
 import json
@@ -41,12 +43,16 @@ def process_url():
         return jsonify({'error': 'URL is required'}), 400
 
     try:
-        response = requests.get(url)
-        response.raise_for_status()  # Raise an exception for bad status codes
-    except requests.exceptions.RequestException as e:
+        options = webdriver.ChromeOptions()
+        options.add_argument('--headless')
+        driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
+        driver.get(url)
+        html = driver.page_source
+        driver.quit()
+    except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-    soup = BeautifulSoup(response.text, 'html.parser')
+    soup = BeautifulSoup(html, 'html.parser')
     paragraphs = [p.get_text() for p in soup.find_all('p')]
 
     paragraphs_with_ids = []
