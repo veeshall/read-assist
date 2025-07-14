@@ -1,0 +1,27 @@
+{
+  "manifest_version": 3,
+  "name": "Docs Overlay Sidebar",
+  "version": "1.0",
+  "description": "Floating sidebar for highlights, notes, and progress on any site.",
+  "permissions": ["storage", "activeTab", "scripting"],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "css": ["sidebar.css"]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["sidebar.html", "sidebar.js", "sidebar.css"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "action": {
+    "default_title": "Toggle Docs Sidebar"
+  }
+} 

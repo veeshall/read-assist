@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Docs Sidebar</title>
+  <link rel="stylesheet" href="sidebar.css">
+</head>
+<body>
+  <div id="sidebar-root">
+    <h2>Docs Overlay</h2>
+    <div id="highlight-section">
+      <button id="highlight-btn">Highlight Selection</button>
+    </div>
+    <div id="notes-section">
+      <h3>Notes</h3>
+      <textarea id="note-input" placeholder="Add a note..."></textarea>
+      <button id="save-note-btn">Save Note</button>
+      <ul id="notes-list"></ul>
+    </div>
+    <div id="progress-section">
+      <h3>Progress</h3>
+      <label><input type="checkbox" id="page-read"> Mark page as read</label>
+    </div>
+  </div>
+  <script src="sidebar.js"></script>
+</body>
+</html> 
